@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -151,6 +150,32 @@ public class ServerPropertiesTests {
 	}
 
 	@Test
+	public void testContextPathWithLeadingWhitespace() {
+		bind("server.servlet.context-path", " /assets");
+		assertThat(this.properties.getServlet().getContextPath()).isEqualTo("/assets");
+	}
+
+	@Test
+	public void testContextPathWithTrailingWhitespace() {
+		bind("server.servlet.context-path", "/assets/copy/ ");
+		assertThat(this.properties.getServlet().getContextPath())
+				.isEqualTo("/assets/copy");
+	}
+
+	@Test
+	public void testContextPathWithLeadingAndTrailingWhitespace() {
+		bind("server.servlet.context-path", " /assets ");
+		assertThat(this.properties.getServlet().getContextPath()).isEqualTo("/assets");
+	}
+
+	@Test
+	public void testContextPathWithLeadingAndTrailingWhitespaceAndContextWithSpace() {
+		bind("server.servlet.context-path", "  /assets /copy/    ");
+		assertThat(this.properties.getServlet().getContextPath())
+				.isEqualTo("/assets /copy");
+	}
+
+	@Test
 	public void testCustomizeUriEncoding() {
 		bind("server.tomcat.uri-encoding", "US-ASCII");
 		assertThat(this.properties.getTomcat().getUriEncoding())
@@ -204,6 +229,12 @@ public class ServerPropertiesTests {
 	public void tomcatAcceptCountMatchesProtocolDefault() throws Exception {
 		assertThat(this.properties.getTomcat().getAcceptCount())
 				.isEqualTo(getDefaultProtocol().getAcceptCount());
+	}
+
+	@Test
+	public void tomcatProcessorCacheMatchesProtocolDefault() throws Exception {
+		assertThat(this.properties.getTomcat().getProcessorCache())
+				.isEqualTo(getDefaultProtocol().getProcessorCache());
 	}
 
 	@Test
@@ -270,13 +301,9 @@ public class ServerPropertiesTests {
 	@Test
 	public void jettyMaxHttpPostSizeMatchesDefault() throws Exception {
 		JettyServletWebServerFactory jettyFactory = new JettyServletWebServerFactory(0);
-		JettyWebServer jetty = (JettyWebServer) jettyFactory
-				.getWebServer(new ServletContextInitializer() {
-
-					@Override
-					public void onStartup(ServletContext servletContext)
-							throws ServletException {
-						servletContext.addServlet("formPost", new HttpServlet() {
+		JettyWebServer jetty = (JettyWebServer) jettyFactory.getWebServer(
+				(ServletContextInitializer) (servletContext) -> servletContext
+						.addServlet("formPost", new HttpServlet() {
 
 							@Override
 							protected void doPost(HttpServletRequest req,
@@ -285,10 +312,7 @@ public class ServerPropertiesTests {
 								req.getParameterMap();
 							}
 
-						}).addMapping("/form");
-					}
-
-				});
+						}).addMapping("/form"));
 		jetty.start();
 		org.eclipse.jetty.server.Connector connector = jetty.getServer()
 				.getConnectors()[0];

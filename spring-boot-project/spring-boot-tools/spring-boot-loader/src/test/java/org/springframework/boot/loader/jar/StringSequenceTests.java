@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -160,6 +160,13 @@ public class StringSequenceTests {
 		StringSequence b = new StringSequence("urge");
 		StringSequence c = new StringSequence("urgh");
 		assertThat(a).isEqualTo(b).isNotEqualTo(c);
+	}
+
+	@Test
+	public void notEqualsWhenSequencesOfDifferentLength() {
+		StringSequence a = new StringSequence("abcd");
+		StringSequence b = new StringSequence("ef");
+		assertThat(a).isNotEqualTo(b);
 	}
 
 	@Test

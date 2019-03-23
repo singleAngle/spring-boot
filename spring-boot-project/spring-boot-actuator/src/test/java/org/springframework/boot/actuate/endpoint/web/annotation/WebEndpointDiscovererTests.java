@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -182,7 +182,7 @@ public class WebEndpointDiscovererTests {
 
 	@Test
 	public void getEndpointsWhenHasCacheWithTtlShouldCacheReadOperationWithTtlValue() {
-		load((id) -> 500L, (id) -> id.toString(), TestEndpointConfiguration.class,
+		load((id) -> 500L, EndpointId::toString, TestEndpointConfiguration.class,
 				(discoverer) -> {
 					Map<EndpointId, ExposableWebEndpoint> endpoints = mapEndpoints(
 							discoverer.getEndpoints());
@@ -246,15 +246,14 @@ public class WebEndpointDiscovererTests {
 	}
 
 	private void load(Class<?> configuration, Consumer<WebEndpointDiscoverer> consumer) {
-		this.load((id) -> null, (id) -> id.toString(), configuration, consumer);
+		this.load((id) -> null, EndpointId::toString, configuration, consumer);
 	}
 
 	private void load(Function<EndpointId, Long> timeToLive,
 			PathMapper endpointPathMapper, Class<?> configuration,
 			Consumer<WebEndpointDiscoverer> consumer) {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				configuration);
-		try {
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				configuration)) {
 			ConversionServiceParameterValueMapper parameterMapper = new ConversionServiceParameterValueMapper(
 					DefaultConversionService.getSharedInstance());
 			EndpointMediaTypes mediaTypes = new EndpointMediaTypes(
@@ -266,9 +265,6 @@ public class WebEndpointDiscovererTests {
 					Collections.singleton(new CachingOperationInvokerAdvisor(timeToLive)),
 					Collections.emptyList());
 			consumer.accept(discoverer);
-		}
-		finally {
-			context.close();
 		}
 	}
 
@@ -305,12 +301,12 @@ public class WebEndpointDiscovererTests {
 		return new RequestPredicateMatcher(path);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class EmptyConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class MultipleEndpointsConfiguration {
 
 		@Bean
@@ -325,7 +321,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class TestWebEndpointExtensionConfiguration {
 
 		@Bean
@@ -335,7 +331,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class ClashingOperationsEndpointConfiguration {
 
 		@Bean
@@ -345,7 +341,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class ClashingOperationsWebEndpointExtensionConfiguration {
 
 		@Bean
@@ -355,7 +351,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(TestEndpointConfiguration.class)
 	static class OverriddenOperationWebEndpointExtensionConfiguration {
 
@@ -366,7 +362,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(TestEndpointConfiguration.class)
 	static class AdditionalOperationWebEndpointConfiguration {
 
@@ -377,7 +373,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class TestEndpointConfiguration {
 
 		@Bean
@@ -387,7 +383,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class ClashingWebEndpointConfiguration {
 
 		@Bean
@@ -407,7 +403,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class ClashingStandardEndpointConfiguration {
 
 		@Bean
@@ -422,7 +418,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class ClashingSelectorsWebEndpointExtensionConfiguration {
 
 		@Bean
@@ -437,7 +433,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class InvalidWebExtensionConfiguration {
 
 		@Bean
@@ -452,7 +448,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class VoidWriteOperationEndpointConfiguration {
 
 		@Bean
@@ -462,7 +458,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class ResourceEndpointConfiguration {
 
@@ -473,7 +469,7 @@ public class WebEndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class CustomMediaTypesEndpointConfiguration {
 

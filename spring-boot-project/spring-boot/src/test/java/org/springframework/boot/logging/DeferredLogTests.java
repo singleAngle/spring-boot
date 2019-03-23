@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,7 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.junit.Test;
 
-import org.springframework.beans.DirectFieldAccessor;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -174,10 +174,8 @@ public class DeferredLogTests {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void switchTo() {
-		DirectFieldAccessor deferredLogFieldAccessor = new DirectFieldAccessor(
-				this.deferredLog);
-		List<String> lines = (List<String>) deferredLogFieldAccessor
-				.getPropertyValue("lines");
+		List<String> lines = (List<String>) ReflectionTestUtils.getField(this.deferredLog,
+				"lines");
 		assertThat(lines).isEmpty();
 
 		this.deferredLog.error(this.message, this.throwable);

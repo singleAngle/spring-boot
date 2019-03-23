@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,7 +42,7 @@ public class BootJarTests extends AbstractBootArchiveTests<BootJar> {
 		bootJar.setMainClassName("com.example.Application");
 		bootJar.getBootInf().into("test")
 				.from(new File("build.gradle").getAbsolutePath());
-		bootJar.execute();
+		bootJar.copy();
 		try (JarFile jarFile = new JarFile(bootJar.getArchivePath())) {
 			assertThat(jarFile.getJarEntry("BOOT-INF/test/build.gradle")).isNotNull();
 		}
@@ -54,10 +54,15 @@ public class BootJarTests extends AbstractBootArchiveTests<BootJar> {
 		bootJar.setMainClassName("com.example.Application");
 		bootJar.bootInf((copySpec) -> copySpec.into("test")
 				.from(new File("build.gradle").getAbsolutePath()));
-		bootJar.execute();
+		bootJar.copy();
 		try (JarFile jarFile = new JarFile(bootJar.getArchivePath())) {
 			assertThat(jarFile.getJarEntry("BOOT-INF/test/build.gradle")).isNotNull();
 		}
+	}
+
+	@Override
+	protected void executeTask() {
+		getTask().copy();
 	}
 
 }

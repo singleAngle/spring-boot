@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,10 @@ import org.mockito.Mockito;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ReactiveWebApplicationContextRunner;
+import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.web.embedded.tomcat.TomcatContextCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatReactiveWebServerFactory;
+import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebApplicationContext;
 import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
 import org.springframework.boot.web.reactive.server.ConfigurableReactiveWebServerFactory;
 import org.springframework.boot.web.reactive.server.ReactiveWebServerFactory;
@@ -37,6 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link ReactiveWebServerFactoryAutoConfiguration}.
  *
  * @author Brian Clozel
+ * @author Raheela Aslam
  */
 public class ReactiveWebServerFactoryAutoConfigurationTests {
 
@@ -97,7 +101,37 @@ public class ReactiveWebServerFactoryAutoConfigurationTests {
 								.isInstanceOf(TomcatReactiveWebServerFactory.class));
 	}
 
-	@Configuration
+	@Test
+	public void tomcatConnectorCustomizerBeanIsAddedToFactory() {
+		ReactiveWebApplicationContextRunner runner = new ReactiveWebApplicationContextRunner(
+				AnnotationConfigReactiveWebApplicationContext::new)
+						.withConfiguration(AutoConfigurations
+								.of(ReactiveWebServerFactoryAutoConfiguration.class))
+						.withUserConfiguration(
+								TomcatConnectorCustomizerConfiguration.class);
+		runner.run((context) -> {
+			TomcatReactiveWebServerFactory factory = context
+					.getBean(TomcatReactiveWebServerFactory.class);
+			assertThat(factory.getTomcatConnectorCustomizers()).hasSize(1);
+		});
+	}
+
+	@Test
+	public void tomcatContextCustomizerBeanIsAddedToFactory() {
+		ReactiveWebApplicationContextRunner runner = new ReactiveWebApplicationContextRunner(
+				AnnotationConfigReactiveWebApplicationContext::new)
+						.withConfiguration(AutoConfigurations
+								.of(ReactiveWebServerFactoryAutoConfiguration.class))
+						.withUserConfiguration(
+								TomcatContextCustomizerConfiguration.class);
+		runner.run((context) -> {
+			TomcatReactiveWebServerFactory factory = context
+					.getBean(TomcatReactiveWebServerFactory.class);
+			assertThat(factory.getTomcatContextCustomizers()).hasSize(1);
+		});
+	}
+
+	@Configuration(proxyBeanMethods = false)
 	protected static class HttpHandlerConfiguration {
 
 		@Bean
@@ -107,7 +141,7 @@ public class ReactiveWebServerFactoryAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TooManyHttpHandlers {
 
 		@Bean
@@ -117,7 +151,7 @@ public class ReactiveWebServerFactoryAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class ReactiveWebServerCustomization {
 
 		@Bean
@@ -127,12 +161,34 @@ public class ReactiveWebServerFactoryAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class MockWebServerConfiguration {
 
 		@Bean
 		public MockReactiveWebServerFactory mockReactiveWebServerFactory() {
 			return new MockReactiveWebServerFactory();
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	static class TomcatConnectorCustomizerConfiguration {
+
+		@Bean
+		public TomcatConnectorCustomizer connectorCustomizer() {
+			return (connector) -> {
+			};
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	static class TomcatContextCustomizerConfiguration {
+
+		@Bean
+		public TomcatContextCustomizer contextCustomizer() {
+			return (context) -> {
+			};
 		}
 
 	}

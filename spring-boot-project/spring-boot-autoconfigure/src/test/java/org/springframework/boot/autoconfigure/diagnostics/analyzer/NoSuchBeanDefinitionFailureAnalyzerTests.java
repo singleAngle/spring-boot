@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoUniqueBeanDefinitionException;
@@ -38,6 +37,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.util.ClassUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -227,8 +227,8 @@ public class NoSuchBeanDefinitionFailureAnalyzerTests {
 
 	private static void addExclusions(NoSuchBeanDefinitionFailureAnalyzer analyzer,
 			Class<?>... classes) {
-		ConditionEvaluationReport report = (ConditionEvaluationReport) new DirectFieldAccessor(
-				analyzer).getPropertyValue("report");
+		ConditionEvaluationReport report = (ConditionEvaluationReport) ReflectionTestUtils
+				.getField(analyzer, "report");
 		List<String> exclusions = new ArrayList<>(report.getExclusions());
 		for (Class<?> c : classes) {
 			exclusions.add(c.getName());
@@ -257,28 +257,28 @@ public class NoSuchBeanDefinitionFailureAnalyzerTests {
 		return analysis;
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ImportAutoConfiguration(TestPropertyAutoConfiguration.class)
 	@Import(StringHandler.class)
 	protected static class StringPropertyTypeConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ImportAutoConfiguration(TestPropertyAutoConfiguration.class)
 	@Import(NumberHandler.class)
 	protected static class IntegerPropertyTypeConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ImportAutoConfiguration(TestTypeClassAutoConfiguration.class)
 	@Import(StringHandler.class)
 	protected static class MissingClassOnAutoConfigurationConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ImportAutoConfiguration({ TestPropertyAutoConfiguration.class,
 			TestTypeClassAutoConfiguration.class })
 	@Import(StringHandler.class)
@@ -286,21 +286,21 @@ public class NoSuchBeanDefinitionFailureAnalyzerTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ImportAutoConfiguration(TestMissingBeanAutoConfiguration.class)
 	@Import(StringNameHandler.class)
 	protected static class StringMissingBeanNameConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ImportAutoConfiguration(TestNullBeanConfiguration.class)
 	@Import(StringHandler.class)
 	protected static class StringNullBeanConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class TestPropertyAutoConfiguration {
 
 		@ConditionalOnProperty("spring.string.enabled")
@@ -317,7 +317,7 @@ public class NoSuchBeanDefinitionFailureAnalyzerTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnClass(name = "com.example.FooBar")
 	public static class TestTypeClassAutoConfiguration {
 
@@ -328,7 +328,7 @@ public class NoSuchBeanDefinitionFailureAnalyzerTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class TestMissingBeanAutoConfiguration {
 
 		@ConditionalOnBean(Integer.class)
@@ -339,7 +339,7 @@ public class NoSuchBeanDefinitionFailureAnalyzerTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class TestNullBeanConfiguration {
 
 		@Bean
@@ -349,7 +349,7 @@ public class NoSuchBeanDefinitionFailureAnalyzerTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	public static class QualifiedBeanConfiguration {
 
 		@Bean

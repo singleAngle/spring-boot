@@ -3,11 +3,13 @@ platform: linux
 inputs:
 - name: git-repo
 - name: artifactory-repo
+outputs:
+- name: version
 params:
   BINTRAY_REPO:
   BINTRAY_SUBJECT:
   BINTRAY_USERNAME:
-  BINTRAY_PASSWORD:
+  BINTRAY_API_KEY:
   SONATYPE_USER_TOKEN:
   SONATYPE_PASSWORD_TOKEN:
 run:

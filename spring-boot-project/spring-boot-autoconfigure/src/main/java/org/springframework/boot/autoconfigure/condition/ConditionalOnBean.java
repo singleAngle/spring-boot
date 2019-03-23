@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,8 +27,9 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Conditional;
 
 /**
- * {@link Conditional} that only matches when beans of the specified classes and/or with
- * the specified names are already contained in the {@link BeanFactory}.
+ * {@link Conditional} that only matches when beans meeting all the specified requirements
+ * are already contained in the {@link BeanFactory}. All the requirements must be met for
+ * the condition to match, but they do not have to be met by the same bean.
  * <p>
  * When placed on a {@code @Bean} method, the bean class defaults to the return type of
  * the factory method:

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -68,8 +68,8 @@ class JavaBeanBinder implements BeanBinder {
 	private <T> boolean bind(BeanPropertyBinder propertyBinder, Bean<T> bean,
 			BeanSupplier<T> beanSupplier) {
 		boolean bound = false;
-		for (Map.Entry<String, BeanProperty> entry : bean.getProperties().entrySet()) {
-			bound |= bind(beanSupplier, propertyBinder, entry.getValue());
+		for (BeanProperty beanProperty : bean.getProperties().values()) {
+			bound |= bind(beanSupplier, propertyBinder, beanProperty);
 		}
 		return bound;
 	}

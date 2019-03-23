@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,7 +30,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.boot.convert.DurationUnit;
 import org.springframework.boot.web.server.Compression;
@@ -56,6 +55,7 @@ import org.springframework.util.unit.DataSize;
  * @author Brian Clozel
  * @author Olivier Lamy
  * @author Chentao Qu
+ * @author Artsiom Yudovin
  */
 @ConfigurationProperties(prefix = "server", ignoreUnknownFields = true)
 public class ServerProperties {
@@ -231,10 +231,11 @@ public class ServerProperties {
 		}
 
 		private String cleanContextPath(String contextPath) {
-			if (StringUtils.hasText(contextPath) && contextPath.endsWith("/")) {
-				return contextPath.substring(0, contextPath.length() - 1);
+			String candidate = StringUtils.trimWhitespace(contextPath);
+			if (StringUtils.hasText(candidate) && candidate.endsWith("/")) {
+				return candidate.substring(0, candidate.length() - 1);
 			}
-			return contextPath;
+			return candidate;
 		}
 
 		public String getApplicationDisplayName() {
@@ -330,11 +331,6 @@ public class ServerProperties {
 		private DataSize maxHttpPostSize = DataSize.ofMegabytes(2);
 
 		/**
-		 * Maximum size of the HTTP message header.
-		 */
-		private DataSize maxHttpHeaderSize = DataSize.ofBytes(0);
-
-		/**
 		 * Maximum amount of request body to swallow.
 		 */
 		private DataSize maxSwallowSize = DataSize.ofMegabytes(2);
@@ -368,6 +364,12 @@ public class ServerProperties {
 		 * processing threads are in use.
 		 */
 		private int acceptCount = 100;
+
+		/**
+		 * Maximum number of idle processors that will be retained in the cache and reused
+		 * with a subsequent request.
+		 */
+		private int processorCache = 200;
 
 		/**
 		 * Comma-separated list of additional patterns that match jars to ignore for TLD
@@ -497,17 +499,6 @@ public class ServerProperties {
 			this.maxConnections = maxConnections;
 		}
 
-		@Deprecated
-		@DeprecatedConfigurationProperty(replacement = "server.max-http-header-size")
-		public DataSize getMaxHttpHeaderSize() {
-			return this.maxHttpHeaderSize;
-		}
-
-		@Deprecated
-		public void setMaxHttpHeaderSize(DataSize maxHttpHeaderSize) {
-			this.maxHttpHeaderSize = maxHttpHeaderSize;
-		}
-
 		public DataSize getMaxSwallowSize() {
 			return this.maxSwallowSize;
 		}
@@ -522,6 +513,14 @@ public class ServerProperties {
 
 		public void setAcceptCount(int acceptCount) {
 			this.acceptCount = acceptCount;
+		}
+
+		public int getProcessorCache() {
+			return this.processorCache;
+		}
+
+		public void setProcessorCache(int processorCache) {
+			this.processorCache = processorCache;
 		}
 
 		public List<String> getAdditionalTldSkipPatterns() {
@@ -577,6 +576,11 @@ public class ServerProperties {
 			 * time.
 			 */
 			private boolean renameOnRotate = false;
+
+			/**
+			 * Number of days to retain the access log files before they are removed.
+			 */
+			private int maxDays = -1;
 
 			/**
 			 * Date format to place in the log file name.
@@ -648,6 +652,14 @@ public class ServerProperties {
 
 			public void setRenameOnRotate(boolean renameOnRotate) {
 				this.renameOnRotate = renameOnRotate;
+			}
+
+			public int getMaxDays() {
+				return this.maxDays;
+			}
+
+			public void setMaxDays(int maxDays) {
+				this.maxDays = maxDays;
 			}
 
 			public String getFileDateFormat() {

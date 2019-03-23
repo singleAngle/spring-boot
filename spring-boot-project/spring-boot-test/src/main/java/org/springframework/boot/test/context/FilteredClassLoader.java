@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -62,6 +62,7 @@ public class FilteredClassLoader extends URLClassLoader {
 	 * Create a {@link FilteredClassLoader} that hides resources from the given
 	 * {@link ClassPathResource classpath resources}.
 	 * @param hiddenResources the resources to hide
+	 * @since 2.1.0
 	 */
 	public FilteredClassLoader(ClassPathResource... hiddenResources) {
 		this(Collections.emptyList(),
@@ -164,6 +165,8 @@ public class FilteredClassLoader extends URLClassLoader {
 
 	/**
 	 * Filter to restrict the resources that can be loaded.
+	 *
+	 * @since 2.1.0
 	 */
 	public static final class ClassPathResourceFilter implements Predicate<String> {
 

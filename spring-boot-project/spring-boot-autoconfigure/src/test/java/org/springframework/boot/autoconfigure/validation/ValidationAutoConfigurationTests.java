@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -27,7 +27,6 @@ import javax.validation.constraints.Size;
 import org.junit.After;
 import org.junit.Test;
 
-import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfigurationTests.CustomValidatorConfiguration.TestBeanPostProcessor;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -35,6 +34,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.validation.beanvalidation.CustomValidatorBean;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
@@ -195,9 +195,8 @@ public class ValidationAutoConfigurationTests {
 				.isSameAs(userMethodValidationPostProcessor);
 		assertThat(this.context.getBeansOfType(MethodValidationPostProcessor.class))
 				.hasSize(1);
-		assertThat(this.context.getBean(Validator.class))
-				.isNotSameAs(new DirectFieldAccessor(userMethodValidationPostProcessor)
-						.getPropertyValue("validator"));
+		assertThat(this.context.getBean(Validator.class)).isNotSameAs(ReflectionTestUtils
+				.getField(userMethodValidationPostProcessor, "validator"));
 	}
 
 	@Test
@@ -222,12 +221,12 @@ public class ValidationAutoConfigurationTests {
 		this.context = ctx;
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class Config {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class UserDefinedValidatorConfig {
 
 		@Bean
@@ -237,7 +236,7 @@ public class ValidationAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class UserDefinedDefaultValidatorConfig {
 
 		@Bean
@@ -247,7 +246,7 @@ public class ValidationAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class UserDefinedJsrValidatorConfig {
 
 		@Bean
@@ -257,7 +256,7 @@ public class ValidationAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class UserDefinedSpringValidatorConfig {
 
 		@Bean
@@ -272,7 +271,7 @@ public class ValidationAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class UserDefinedPrimarySpringValidatorConfig {
 
 		@Bean
@@ -313,7 +312,7 @@ public class ValidationAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class AnotherSampleServiceConfiguration {
 
 		@Bean
@@ -323,7 +322,7 @@ public class ValidationAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class SampleConfiguration {
 
 		@Bean
@@ -333,7 +332,7 @@ public class ValidationAutoConfigurationTests {
 
 	}
 
-	@org.springframework.context.annotation.Configuration
+	@org.springframework.context.annotation.Configuration(proxyBeanMethods = false)
 	static class CustomValidatorConfiguration {
 
 		CustomValidatorConfiguration(SomeService someService) {
@@ -350,7 +349,7 @@ public class ValidationAutoConfigurationTests {
 			return new TestBeanPostProcessor();
 		}
 
-		@Configuration
+		@Configuration(proxyBeanMethods = false)
 		static class SomeServiceConfiguration {
 
 			@Bean

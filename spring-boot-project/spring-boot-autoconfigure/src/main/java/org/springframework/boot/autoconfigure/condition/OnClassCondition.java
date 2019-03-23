@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -46,9 +46,23 @@ class OnClassCondition extends FilteringSpringBootCondition {
 	@Override
 	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
-		// Split the work and perform half in a background thread. Using a single
-		// additional thread seems to offer the best performance. More threads make
-		// things worse
+		// Split the work and perform half in a background thread if more than one
+		// processor is available. Using a single additional thread seems to offer the
+		// best performance. More threads make things worse.
+		if (Runtime.getRuntime().availableProcessors() > 1) {
+			return resolveOutcomesThreaded(autoConfigurationClasses,
+					autoConfigurationMetadata);
+		}
+		else {
+			OutcomesResolver outcomesResolver = new StandardOutcomesResolver(
+					autoConfigurationClasses, 0, autoConfigurationClasses.length,
+					autoConfigurationMetadata, getBeanClassLoader());
+			return outcomesResolver.resolveOutcomes();
+		}
+	}
+
+	private ConditionOutcome[] resolveOutcomesThreaded(String[] autoConfigurationClasses,
+			AutoConfigurationMetadata autoConfigurationMetadata) {
 		int split = autoConfigurationClasses.length / 2;
 		OutcomesResolver firstHalfResolver = createOutcomesResolver(
 				autoConfigurationClasses, 0, split, autoConfigurationMetadata);
@@ -213,13 +227,12 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		private ConditionOutcome getOutcome(String candidates) {
 			try {
 				if (!candidates.contains(",")) {
-					return getOutcome(candidates, ClassNameFilter.MISSING,
-							this.beanClassLoader);
+					return getOutcome(candidates, this.beanClassLoader);
 				}
 				for (String candidate : StringUtils
 						.commaDelimitedListToStringArray(candidates)) {
 					ConditionOutcome outcome = getOutcome(candidate,
-							ClassNameFilter.MISSING, this.beanClassLoader);
+							this.beanClassLoader);
 					if (outcome != null) {
 						return outcome;
 					}
@@ -231,9 +244,8 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			return null;
 		}
 
-		private ConditionOutcome getOutcome(String className,
-				ClassNameFilter classNameFilter, ClassLoader classLoader) {
-			if (classNameFilter.matches(className, classLoader)) {
+		private ConditionOutcome getOutcome(String className, ClassLoader classLoader) {
+			if (ClassNameFilter.MISSING.matches(className, classLoader)) {
 				return ConditionOutcome.noMatch(ConditionMessage
 						.forCondition(ConditionalOnClass.class)
 						.didNotFind("required class").items(Style.QUOTE, className));

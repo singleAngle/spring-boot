@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -104,8 +104,20 @@ public class PrometheusMetricsExportAutoConfigurationTests {
 				.withConfiguration(
 						AutoConfigurations.of(ManagementContextAutoConfiguration.class))
 				.withUserConfiguration(BaseConfiguration.class)
+				.withPropertyValues(
+						"management.endpoints.web.exposure.include=prometheus")
 				.run((context) -> assertThat(context)
 						.hasSingleBean(PrometheusScrapeEndpoint.class));
+	}
+
+	@Test
+	public void scrapeEndpointNotAddedToManagementContextWhenNotExposed() {
+		this.contextRunner
+				.withConfiguration(
+						AutoConfigurations.of(ManagementContextAutoConfiguration.class))
+				.withUserConfiguration(BaseConfiguration.class)
+				.run((context) -> assertThat(context)
+						.doesNotHaveBean(PrometheusScrapeEndpoint.class));
 	}
 
 	@Test
@@ -113,6 +125,8 @@ public class PrometheusMetricsExportAutoConfigurationTests {
 		this.contextRunner
 				.withConfiguration(
 						AutoConfigurations.of(ManagementContextAutoConfiguration.class))
+				.withPropertyValues(
+						"management.endpoints.web.exposure.include=prometheus")
 				.withPropertyValues("management.endpoint.prometheus.enabled=false")
 				.withUserConfiguration(BaseConfiguration.class)
 				.run((context) -> assertThat(context)
@@ -141,7 +155,7 @@ public class PrometheusMetricsExportAutoConfigurationTests {
 						.hasSingleBean(PrometheusPushGatewayManager.class));
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class BaseConfiguration {
 
 		@Bean
@@ -151,25 +165,18 @@ public class PrometheusMetricsExportAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class CustomConfigConfiguration {
 
 		@Bean
 		public PrometheusConfig customConfig() {
-			return new PrometheusConfig() {
-
-				@Override
-				public String get(String k) {
-					return null;
-				}
-
-			};
+			return (key) -> null;
 		}
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class CustomRegistryConfiguration {
 
@@ -181,7 +188,7 @@ public class PrometheusMetricsExportAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class CustomCollectorRegistryConfiguration {
 
@@ -192,7 +199,7 @@ public class PrometheusMetricsExportAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class CustomEndpointConfiguration {
 

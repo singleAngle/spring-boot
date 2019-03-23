@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,6 +42,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.autoconfigure.context.PropertyPlaceholderAutoConfiguration;
 import org.springframework.boot.test.rule.OutputCapture;
 import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.boot.testsupport.BuildOutput;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.filter.OrderedCharacterEncodingFilter;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -74,6 +75,8 @@ import static org.hamcrest.Matchers.containsString;
  * @author Artsiom Yudovin
  */
 public class ThymeleafServletAutoConfigurationTests {
+
+	private final BuildOutput buildOutput = new BuildOutput(getClass());
 
 	@Rule
 	public OutputCapture output = new OutputCapture();
@@ -176,9 +179,10 @@ public class ThymeleafServletAutoConfigurationTests {
 
 	@Test
 	public void templateLocationEmpty() {
-		new File("target/test-classes/templates/empty-directory").mkdir();
+		new File(this.buildOutput.getTestResourcesLocation(),
+				"empty-templates/empty-directory").mkdirs();
 		load(BaseConfiguration.class,
-				"spring.thymeleaf.prefix:classpath:/templates/empty-directory/");
+				"spring.thymeleaf.prefix:classpath:/empty-templates/empty-directory/");
 	}
 
 	@Test
@@ -229,7 +233,8 @@ public class ThymeleafServletAutoConfigurationTests {
 			SecurityContextHolder.setContext(new SecurityContextImpl(
 					new TestingAuthenticationToken("alice", "admin")));
 			String result = engine.process("security-dialect", attrs);
-			assertThat(result).isEqualTo("<html><body><div>alice</div></body></html>\n");
+			assertThat(result).isEqualTo("<html><body><div>alice</div></body></html>"
+					+ System.lineSeparator());
 		}
 		finally {
 			SecurityContextHolder.clearContext();
@@ -333,14 +338,14 @@ public class ThymeleafServletAutoConfigurationTests {
 		this.context.refresh();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ImportAutoConfiguration({ ThymeleafAutoConfiguration.class,
 			PropertyPlaceholderAutoConfiguration.class })
 	static class BaseConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class LayoutDialectConfiguration {
 
@@ -351,13 +356,13 @@ public class ThymeleafServletAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class FilterRegistrationResourceConfiguration {
 
 		@Bean
 		public FilterRegistrationBean<ResourceUrlEncodingFilter> filterRegistration() {
-			FilterRegistrationBean<ResourceUrlEncodingFilter> bean = new FilterRegistrationBean<ResourceUrlEncodingFilter>(
+			FilterRegistrationBean<ResourceUrlEncodingFilter> bean = new FilterRegistrationBean<>(
 					new ResourceUrlEncodingFilter());
 			bean.setDispatcherTypes(EnumSet.of(DispatcherType.INCLUDE));
 			return bean;
@@ -365,14 +370,13 @@ public class ThymeleafServletAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@Import(BaseConfiguration.class)
 	static class FilterRegistrationOtherConfiguration {
 
 		@Bean
 		public FilterRegistrationBean<OrderedCharacterEncodingFilter> filterRegistration() {
-			return new FilterRegistrationBean<OrderedCharacterEncodingFilter>(
-					new OrderedCharacterEncodingFilter());
+			return new FilterRegistrationBean<>(new OrderedCharacterEncodingFilter());
 		}
 
 	}

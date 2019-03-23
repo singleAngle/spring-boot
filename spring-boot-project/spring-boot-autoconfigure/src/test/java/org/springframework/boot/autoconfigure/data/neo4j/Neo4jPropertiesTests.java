@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link Neo4jProperties}.
  *
  * @author Stephane Nicoll
+ * @author Michael Simons
  */
 public class Neo4jPropertiesTests {
 
@@ -141,10 +142,25 @@ public class Neo4jPropertiesTests {
 	@Test
 	public void embeddedModeWithRelativeLocation() {
 		Neo4jProperties properties = load(true,
-				"spring.data.neo4j.uri=file:target/neo4j/my.db");
+				"spring.data.neo4j.uri=file:relative/path/to/my.db");
 		Configuration configuration = properties.createConfiguration();
 		assertDriver(configuration, Neo4jProperties.EMBEDDED_DRIVER,
-				"file:target/neo4j/my.db");
+				"file:relative/path/to/my.db");
+	}
+
+	@Test
+	public void nativeTypesAreSetToFalseByDefault() {
+		Neo4jProperties properties = load(true);
+		Configuration configuration = properties.createConfiguration();
+		assertThat(configuration.getUseNativeTypes()).isFalse();
+	}
+
+	@Test
+	public void nativeTypesCanBeConfigured() {
+		Neo4jProperties properties = load(true,
+				"spring.data.neo4j.use-native-types=true");
+		Configuration configuration = properties.createConfiguration();
+		assertThat(configuration.getUseNativeTypes()).isTrue();
 	}
 
 	private static void assertDriver(Configuration actual, String driver, String uri) {
@@ -183,7 +199,7 @@ public class Neo4jPropertiesTests {
 		return this.context.getBean(Neo4jProperties.class);
 	}
 
-	@org.springframework.context.annotation.Configuration
+	@org.springframework.context.annotation.Configuration(proxyBeanMethods = false)
 	@EnableConfigurationProperties(Neo4jProperties.class)
 	static class TestConfiguration {
 

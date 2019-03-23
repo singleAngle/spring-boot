@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,6 @@ import org.junit.Test;
 import org.messaginghub.pooled.jms.JmsPoolConnectionFactory;
 
 import org.springframework.beans.BeansException;
-import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfiguration;
@@ -184,9 +183,9 @@ public class JmsAutoConfigurationTests {
 					DefaultMessageListenerContainer container = getContainer(context,
 							"jmsListenerContainerFactory");
 					assertThat(container.isSessionTransacted()).isFalse();
-					assertThat(new DirectFieldAccessor(container)
-							.getPropertyValue("transactionManager")).isSameAs(
-									context.getBean(JtaTransactionManager.class));
+					assertThat(container).hasFieldOrPropertyWithValue(
+							"transactionManager",
+							context.getBean(JtaTransactionManager.class));
 				});
 	}
 
@@ -197,8 +196,8 @@ public class JmsAutoConfigurationTests {
 					DefaultMessageListenerContainer container = getContainer(context,
 							"jmsListenerContainerFactory");
 					assertThat(container.isSessionTransacted()).isTrue();
-					assertThat(new DirectFieldAccessor(container)
-							.getPropertyValue("transactionManager")).isNull();
+					assertThat(container)
+							.hasFieldOrPropertyWithValue("transactionManager", null);
 				});
 	}
 
@@ -209,8 +208,8 @@ public class JmsAutoConfigurationTests {
 					DefaultMessageListenerContainer container = getContainer(context,
 							"jmsListenerContainerFactory");
 					assertThat(container.isSessionTransacted()).isTrue();
-					assertThat(new DirectFieldAccessor(container)
-							.getPropertyValue("transactionManager")).isNull();
+					assertThat(container)
+							.hasFieldOrPropertyWithValue("transactionManager", null);
 				});
 	}
 
@@ -433,12 +432,12 @@ public class JmsAutoConfigurationTests {
 								JmsListenerConfigUtils.JMS_LISTENER_ENDPOINT_REGISTRY_BEAN_NAME));
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration2 {
 
 		@Bean
@@ -452,7 +451,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration3 {
 
 		@Bean
@@ -464,7 +463,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration4 implements BeanPostProcessor {
 
 		@Override
@@ -485,7 +484,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration5 {
 
 		@Bean
@@ -498,7 +497,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration6 {
 
 		@Bean
@@ -511,7 +510,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration7 {
 
 		@Bean
@@ -521,7 +520,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration8 {
 
 		@Bean
@@ -531,7 +530,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class MessageConvertersConfiguration {
 
 		@Bean
@@ -547,7 +546,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class DestinationResolversConfiguration {
 
 		@Bean
@@ -563,7 +562,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration9 {
 
 		@Bean
@@ -579,7 +578,7 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class TestConfiguration10 {
 
 		@Bean
@@ -594,13 +593,13 @@ public class JmsAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@EnableJms
 	protected static class EnableJmsConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class NoEnableJmsConfiguration {
 
 	}

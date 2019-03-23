@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -30,6 +30,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.boot.actuate.endpoint.EndpointFilter;
@@ -131,12 +132,15 @@ public abstract class EndpointDiscoverer<E extends ExposableEndpoint<O>, O exten
 		String[] beanNames = BeanFactoryUtils.beanNamesForAnnotationIncludingAncestors(
 				this.applicationContext, Endpoint.class);
 		for (String beanName : beanNames) {
-			EndpointBean endpointBean = createEndpointBean(beanName);
-			EndpointBean previous = byId.putIfAbsent(endpointBean.getId(), endpointBean);
-			Assert.state(previous == null,
-					() -> "Found two endpoints with the id '" + endpointBean.getId()
-							+ "': '" + endpointBean.getBeanName() + "' and '"
-							+ previous.getBeanName() + "'");
+			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
+				EndpointBean endpointBean = createEndpointBean(beanName);
+				EndpointBean previous = byId.putIfAbsent(endpointBean.getId(),
+						endpointBean);
+				Assert.state(previous == null,
+						() -> "Found two endpoints with the id '" + endpointBean.getId()
+								+ "': '" + endpointBean.getBeanName() + "' and '"
+								+ previous.getBeanName() + "'");
+			}
 		}
 		return byId.values();
 	}

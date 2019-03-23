@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -31,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * Basic integration tests for demo application.
@@ -56,9 +57,10 @@ public class SampleSecureApplicationTests {
 		SecurityContextHolder.clearContext();
 	}
 
-	@Test(expected = AuthenticationException.class)
+	@Test
 	public void secure() {
-		assertThat("Hello Security").isEqualTo(this.service.secure());
+		assertThatExceptionOfType(AuthenticationException.class)
+				.isThrownBy(() -> SampleSecureApplicationTests.this.service.secure());
 	}
 
 	@Test
@@ -73,10 +75,11 @@ public class SampleSecureApplicationTests {
 		assertThat("Hello World").isEqualTo(this.service.authorized());
 	}
 
-	@Test(expected = AccessDeniedException.class)
+	@Test
 	public void denied() {
 		SecurityContextHolder.getContext().setAuthentication(this.authentication);
-		assertThat("Goodbye World").isEqualTo(this.service.denied());
+		assertThatExceptionOfType(AccessDeniedException.class)
+				.isThrownBy(() -> SampleSecureApplicationTests.this.service.denied());
 	}
 
 }

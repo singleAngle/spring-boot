@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,6 +20,7 @@ import java.sql.Connection;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -93,7 +94,8 @@ public class FlywayAutoConfigurationTests {
 	@Test
 	public void createDataSourceWithUser() {
 		this.contextRunner.withUserConfiguration(EmbeddedDataSourceConfiguration.class)
-				.withPropertyValues("spring.datasource.url:jdbc:hsqldb:mem:normal",
+				.withPropertyValues(
+						"spring.datasource.url:jdbc:hsqldb:mem:" + UUID.randomUUID(),
 						"spring.flyway.user:sa")
 				.run((context) -> {
 					assertThat(context).hasSingleBean(Flyway.class);
@@ -378,7 +380,7 @@ public class FlywayAutoConfigurationTests {
 				});
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class FlywayDataSourceConfiguration {
 
 		@Bean
@@ -397,7 +399,7 @@ public class FlywayAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class CustomFlywayMigrationInitializer {
 
 		@Bean
@@ -410,7 +412,7 @@ public class FlywayAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	protected static class CustomFlywayWithJpaConfiguration {
 
 		private final DataSource dataSource;
@@ -452,7 +454,7 @@ public class FlywayAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class CallbackConfiguration {
 
 		@Bean
@@ -476,7 +478,7 @@ public class FlywayAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class LegacyCallbackConfiguration {
 
 		@Bean
@@ -493,7 +495,7 @@ public class FlywayAutoConfigurationTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class ConfigurationCustomizerConfiguration {
 
 		@Bean

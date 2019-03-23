@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -146,6 +146,18 @@ public class EndpointDiscovererTests {
 						.isThrownBy(new TestEndpointDiscoverer(context)::getEndpoints)
 						.withMessageContaining(
 								"Found two endpoints with the id 'test': "));
+	}
+
+	@Test
+	public void getEndpointsWhenEndpointsArePrefixedWithScopedTargetShouldRegisterOnlyOneEndpoint() {
+		load(ScopedTargetEndpointConfiguration.class, (context) -> {
+			TestEndpoint expectedEndpoint = context.getBean("testEndpoint",
+					TestEndpoint.class);
+			Collection<TestExposableEndpoint> endpoints = new TestEndpointDiscoverer(
+					context).getEndpoints();
+			assertThat(endpoints).flatExtracting(TestExposableEndpoint::getEndpointBean)
+					.containsOnly(expectedEndpoint);
+		});
 	}
 
 	@Test
@@ -353,12 +365,12 @@ public class EndpointDiscovererTests {
 		}
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class EmptyConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class TestEndpointConfiguration {
 
 		@Bean
@@ -368,7 +380,7 @@ public class EndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class TestEndpointSubclassConfiguration {
 
 		@Bean
@@ -378,7 +390,7 @@ public class EndpointDiscovererTests {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class ClashingEndpointConfiguration {
 
 		@Bean
@@ -388,6 +400,21 @@ public class EndpointDiscovererTests {
 
 		@Bean
 		public TestEndpoint testEndpointOne() {
+			return new TestEndpoint();
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	static class ScopedTargetEndpointConfiguration {
+
+		@Bean
+		public TestEndpoint testEndpoint() {
+			return new TestEndpoint();
+		}
+
+		@Bean(name = "scopedTarget.testEndpoint")
+		public TestEndpoint scopedTargetTestEndpoint() {
 			return new TestEndpoint();
 		}
 

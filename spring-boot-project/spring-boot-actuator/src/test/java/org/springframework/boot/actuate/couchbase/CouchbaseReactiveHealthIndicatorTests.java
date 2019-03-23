@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 package org.springframework.boot.actuate.couchbase;
 
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,7 @@ public class CouchbaseReactiveHealthIndicatorTests {
 		DiagnosticsReport diagnostics = new DiagnosticsReport(endpoints, "test-sdk",
 				"test-id", null);
 		given(cluster.diagnostics()).willReturn(diagnostics);
-		Health health = healthIndicator.health().block();
+		Health health = healthIndicator.health().block(Duration.ofSeconds(30));
 		assertThat(health.getStatus()).isEqualTo(Status.UP);
 		assertThat(health.getDetails()).containsEntry("sdk", "test-sdk");
 		assertThat(health.getDetails()).containsKey("endpoints");
@@ -77,7 +78,7 @@ public class CouchbaseReactiveHealthIndicatorTests {
 		DiagnosticsReport diagnostics = new DiagnosticsReport(endpoints, "test-sdk",
 				"test-id", null);
 		given(cluster.diagnostics()).willReturn(diagnostics);
-		Health health = healthIndicator.health().block();
+		Health health = healthIndicator.health().block(Duration.ofSeconds(30));
 		assertThat(health.getStatus()).isEqualTo(Status.DOWN);
 		assertThat(health.getDetails()).containsEntry("sdk", "test-sdk");
 		assertThat(health.getDetails()).containsKey("endpoints");

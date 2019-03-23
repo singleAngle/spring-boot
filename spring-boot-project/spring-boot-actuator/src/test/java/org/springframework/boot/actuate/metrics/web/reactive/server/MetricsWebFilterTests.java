@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,8 @@
  */
 
 package org.springframework.boot.actuate.metrics.web.reactive.server;
+
+import java.time.Duration;
 
 import io.micrometer.core.instrument.MockClock;
 import io.micrometer.core.instrument.simple.SimpleConfig;
@@ -58,7 +60,7 @@ public class MetricsWebFilterTests {
 		this.webFilter
 				.filter(exchange,
 						(serverWebExchange) -> exchange.getResponse().setComplete())
-				.block();
+				.block(Duration.ofSeconds(30));
 		assertMetricsContainsTag("uri", "/projects/{project}");
 		assertMetricsContainsTag("status", "200");
 	}
@@ -74,7 +76,7 @@ public class MetricsWebFilterTests {
 				.onErrorResume((t) -> {
 					exchange.getResponse().setStatusCodeValue(500);
 					return exchange.getResponse().setComplete();
-				}).block();
+				}).block(Duration.ofSeconds(30));
 		assertMetricsContainsTag("uri", "/projects/{project}");
 		assertMetricsContainsTag("status", "500");
 		assertMetricsContainsTag("exception", "IllegalStateException");
@@ -91,7 +93,7 @@ public class MetricsWebFilterTests {
 				.onErrorResume((t) -> {
 					exchange.getResponse().setStatusCodeValue(500);
 					return exchange.getResponse().setComplete();
-				}).block();
+				}).block(Duration.ofSeconds(30));
 		assertMetricsContainsTag("uri", "/projects/{project}");
 		assertMetricsContainsTag("status", "500");
 		assertMetricsContainsTag("exception", anonymous.getClass().getName());
@@ -105,7 +107,7 @@ public class MetricsWebFilterTests {
 			exchange.getResponse().setStatusCodeValue(500);
 			return exchange.getResponse().setComplete()
 					.then(Mono.error(new IllegalStateException("test error")));
-		}).onErrorResume((t) -> Mono.empty()).block();
+		}).onErrorResume((t) -> Mono.empty()).block(Duration.ofSeconds(30));
 		assertMetricsContainsTag("uri", "/projects/{project}");
 		assertMetricsContainsTag("status", "500");
 	}

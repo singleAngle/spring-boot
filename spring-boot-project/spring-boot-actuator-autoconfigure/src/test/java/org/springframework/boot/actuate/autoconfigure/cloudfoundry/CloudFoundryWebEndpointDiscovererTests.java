@@ -1,11 +1,11 @@
 /*
- * Copyright 2012-2018 the original author or authors.
+ * Copyright 2012-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -80,15 +80,14 @@ public class CloudFoundryWebEndpointDiscovererTests {
 
 	private void load(Class<?> configuration,
 			Consumer<CloudFoundryWebEndpointDiscoverer> consumer) {
-		this.load((id) -> null, (id) -> id.toString(), configuration, consumer);
+		this.load((id) -> null, EndpointId::toString, configuration, consumer);
 	}
 
 	private void load(Function<EndpointId, Long> timeToLive,
 			PathMapper endpointPathMapper, Class<?> configuration,
 			Consumer<CloudFoundryWebEndpointDiscoverer> consumer) {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
-				configuration);
-		try {
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(
+				configuration)) {
 			ConversionServiceParameterValueMapper parameterMapper = new ConversionServiceParameterValueMapper(
 					DefaultConversionService.getSharedInstance());
 			EndpointMediaTypes mediaTypes = new EndpointMediaTypes(
@@ -101,12 +100,9 @@ public class CloudFoundryWebEndpointDiscovererTests {
 					Collections.emptyList());
 			consumer.accept(discoverer);
 		}
-		finally {
-			context.close();
-		}
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class TestConfiguration {
 
 		@Bean
@@ -166,7 +162,7 @@ public class CloudFoundryWebEndpointDiscovererTests {
 
 	}
 
-	@HealthEndpointCloudFoundryExtension
+	@EndpointCloudFoundryExtension(endpoint = HealthEndpoint.class)
 	static class TestHealthEndpointCloudFoundryExtension {
 
 		@ReadOperation

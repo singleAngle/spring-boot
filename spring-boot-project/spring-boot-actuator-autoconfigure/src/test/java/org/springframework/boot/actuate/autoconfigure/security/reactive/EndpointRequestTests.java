@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 
 package org.springframework.boot.actuate.autoconfigure.security.reactive;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -250,8 +251,8 @@ public class EndpointRequestTests {
 		}
 
 		private void matches(ServerWebExchange exchange) {
-			assertThat(this.matcher.matches(exchange).block().isMatch())
-					.as("Matches " + getRequestPath(exchange)).isTrue();
+			assertThat(this.matcher.matches(exchange).block(Duration.ofSeconds(30))
+					.isMatch()).as("Matches " + getRequestPath(exchange)).isTrue();
 		}
 
 		void doesNotMatch(String path) {
@@ -262,8 +263,9 @@ public class EndpointRequestTests {
 		}
 
 		private void doesNotMatch(ServerWebExchange exchange) {
-			assertThat(this.matcher.matches(exchange).block().isMatch())
-					.as("Does not match " + getRequestPath(exchange)).isFalse();
+			assertThat(this.matcher.matches(exchange).block(Duration.ofSeconds(30))
+					.isMatch()).as("Does not match " + getRequestPath(exchange))
+							.isFalse();
 		}
 
 		private TestHttpWebHandlerAdapter webHandler() {

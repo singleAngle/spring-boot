@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -41,6 +41,11 @@ public class OAuth2ResourceServerProperties {
 		private String jwkSetUri;
 
 		/**
+		 * JSON Web Algorithm used for verifying the digital signatures.
+		 */
+		private String jwsAlgorithm = "RS256";
+
+		/**
 		 * URI that an OpenID Connect Provider asserts as its Issuer Identifier.
 		 */
 		private String issuerUri;
@@ -51,6 +56,14 @@ public class OAuth2ResourceServerProperties {
 
 		public void setJwkSetUri(String jwkSetUri) {
 			this.jwkSetUri = jwkSetUri;
+		}
+
+		public String getJwsAlgorithm() {
+			return this.jwsAlgorithm;
+		}
+
+		public void setJwsAlgorithm(String jwsAlgorithm) {
+			this.jwsAlgorithm = jwsAlgorithm;
 		}
 
 		public String getIssuerUri() {

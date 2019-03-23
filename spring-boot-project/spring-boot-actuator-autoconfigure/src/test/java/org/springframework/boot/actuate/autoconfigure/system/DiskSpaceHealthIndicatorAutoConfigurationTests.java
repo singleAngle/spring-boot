@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +18,6 @@ package org.springframework.boot.actuate.autoconfigure.system;
 
 import org.junit.Test;
 
-import org.springframework.beans.DirectFieldAccessor;
 import org.springframework.boot.actuate.autoconfigure.health.HealthIndicatorAutoConfiguration;
 import org.springframework.boot.actuate.health.ApplicationHealthIndicator;
 import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
@@ -63,10 +62,9 @@ public class DiskSpaceHealthIndicatorAutoConfigurationTests {
 				.withPropertyValues("management.health.diskspace.threshold=20MB")
 				.run((context) -> {
 					assertThat(context).hasSingleBean(DiskSpaceHealthIndicator.class);
-					DirectFieldAccessor dfa = new DirectFieldAccessor(
-							context.getBean(DiskSpaceHealthIndicator.class));
-					assertThat(dfa.getPropertyValue("threshold"))
-							.isEqualTo(DataSize.ofMegabytes(20));
+					assertThat(context.getBean(DiskSpaceHealthIndicator.class))
+							.hasFieldOrPropertyWithValue("threshold",
+									DataSize.ofMegabytes(20));
 				});
 	}
 
